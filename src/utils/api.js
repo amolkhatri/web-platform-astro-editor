@@ -1,5 +1,5 @@
-const API_BASE_URL = 'http://localhost:4321/api';
-const VIEWER_API_URL = 'http://localhost:4321/api';
+const API_BASE_URL = 'https://web-platform-astro-viewer.vercel.app/api';
+const VIEWER_API_URL = 'https://web-platform-astro-viewer.vercel.app/api';
 
 /**
  * Fetch component registry from the viewer
