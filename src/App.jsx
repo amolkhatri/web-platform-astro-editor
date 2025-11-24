@@ -31,7 +31,7 @@ function App() {
         setCurrentPage(data[0]);
       }
     } catch (err) {
-      setError('Failed to load pages. Make sure the backend is running on port 3001.');
+      setError('Failed to load pages. Make sure the backend is running on port 3001.' + err);
       console.error(err);
     } finally {
       setLoading(false);
