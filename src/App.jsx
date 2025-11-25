@@ -230,7 +230,10 @@ function App() {
             componentRegistry={componentRegistry}
           />
 
-          <Preview blocks={currentPage.blocks} />
+          <Preview
+            blocks={currentPage.blocks}
+            pageSlug={currentPage.slug}
+          />
 
           <BlockEditor
             block={selectedBlockIndex !== null ? currentPage.blocks[selectedBlockIndex] : null}

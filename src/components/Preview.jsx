@@ -13,6 +13,19 @@ const getRenderApiUrl = () => {
 
 const RENDER_API_URL = getRenderApiUrl();
 
+const getViewerBaseUrl = () => {
+  const isLocalhost = typeof window !== 'undefined' &&
+    (window.location.hostname === 'localhost' ||
+      window.location.hostname === '127.0.0.1' ||
+      window.location.hostname === '');
+
+  return isLocalhost
+    ? 'http://localhost:4321'
+    : 'https://web-platform-astro-viewer.vercel.app';
+};
+
+const VIEWER_BASE_URL = getViewerBaseUrl();
+
 const BASE_LAYOUT_STYLES = `
   *, *::before, *::after {
     box-sizing: border-box;
@@ -106,10 +119,17 @@ const buildPreviewDocument = (blocks) => {
   `;
 };
 
-export default function Preview({ blocks }) {
+export default function Preview({ blocks, pageSlug }) {
     const [renderedBlocks, setRenderedBlocks] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+
+    const normalizedSlug = useMemo(() => {
+      if (!pageSlug) return 'home';
+      return pageSlug.replace(/^\/+/, '') || 'home';
+    }, [pageSlug]);
+
+    const livePreviewUrl = `${VIEWER_BASE_URL}/${normalizedSlug}`;
 
     const previewDocument = useMemo(() => {
       if (!renderedBlocks.length) {
@@ -178,6 +198,12 @@ export default function Preview({ blocks }) {
                 <span className="text-muted text-small">
                     {loading ? 'Rendering...' : 'Live preview'}
                 </span>
+                <button
+                    className="small secondary"
+                    onClick={() => window.open(livePreviewUrl, '_blank', 'noopener,noreferrer')}
+                >
+                    Open live preview ↗
+                </button>
             </div>
             <div className="preview-content">
                 {error && (
