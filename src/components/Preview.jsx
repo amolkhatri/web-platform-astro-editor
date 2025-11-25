@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-const RENDER_API_URL = 'http://localhost:4321/api/render';
+const RENDER_API_URL = 'https://web-platform-astro-viewer.vercel.app/api/render';
 
 export default function Preview({ blocks }) {
     const [renderedBlocks, setRenderedBlocks] = useState([]);
