@@ -1,8 +1,8 @@
 :root {
   /* Colors - Modern Dark Theme */
-  --color-bg-primary: #0a0a0f;
-  --color-bg-secondary: #13131a;
-  --color-bg-tertiary: #1a1a24;
+  --color-bg-primary: #121212;
+  --color-bg-secondary: #1a1a1a;
+  --color-bg-tertiary: #202020;
   --color-bg-elevated: rgba(26, 26, 36, 0.8);
 
   --color-surface: rgba(255, 255, 255, 0.05);
@@ -12,17 +12,17 @@
   --color-border: rgba(255, 255, 255, 0.1);
   --color-border-hover: rgba(255, 255, 255, 0.2);
 
-  --color-text-primary: #ffffff;
-  --color-text-secondary: rgba(255, 255, 255, 0.7);
-  --color-text-tertiary: rgba(255, 255, 255, 0.5);
+  --color-text-primary: #f5f5f5;
+  --color-text-secondary: rgba(245, 245, 245, 0.75);
+  --color-text-tertiary: rgba(245, 245, 245, 0.55);
 
-  --color-accent: #6366f1;
-  --color-accent-hover: #7c3aed;
-  --color-accent-light: rgba(99, 102, 241, 0.1);
+  --color-accent: #94b2ff;
+  --color-accent-hover: #c6d6ff;
+  --color-accent-light: rgba(148, 178, 255, 0.15);
 
-  --color-success: #10b981;
-  --color-warning: #f59e0b;
-  --color-error: #ef4444;
+  --color-success: #6dd58c;
+  --color-warning: #f7c76b;
+  --color-error: #f2b8b5;
 
   /* Spacing */
   --space-xs: 0.25rem;
@@ -183,8 +183,8 @@ button.danger {
 }
 
 button.danger:hover {
-  background: #dc2626;
-  border-color: #dc2626;
+  background: #b01c1c;
+  border-color: #b01c1c;
 }
 
 button.small {
