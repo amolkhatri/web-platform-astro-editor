@@ -1,5 +1,16 @@
-const API_BASE_URL = 'https://web-platform-astro-viewer.vercel.app/api';
-const VIEWER_API_URL = 'https://web-platform-astro-viewer.vercel.app/api';
+// Determine API base URL based on environment
+const getApiBaseUrl = () => {
+  const isLocalhost = typeof window !== 'undefined' && 
+    (window.location.hostname === 'localhost' || 
+     window.location.hostname === '127.0.0.1' ||
+     window.location.hostname === '');
+  return isLocalhost 
+    ? 'http://localhost:4321/api'
+    : 'https://web-platform-astro-viewer.vercel.app/api';
+};
+
+const API_BASE_URL = getApiBaseUrl();
+const VIEWER_API_URL = getApiBaseUrl();
 
 /**
  * Fetch component registry from the viewer

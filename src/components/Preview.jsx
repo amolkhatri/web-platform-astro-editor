@@ -1,6 +1,17 @@
 import { useState, useEffect } from 'react';
 
-const RENDER_API_URL = 'https://web-platform-astro-viewer.vercel.app/api/render';
+// Determine API base URL based on environment
+const getRenderApiUrl = () => {
+  const isLocalhost = typeof window !== 'undefined' && 
+    (window.location.hostname === 'localhost' || 
+     window.location.hostname === '127.0.0.1' ||
+     window.location.hostname === '');
+  return isLocalhost 
+    ? 'http://localhost:4321/api/render'
+    : 'https://web-platform-astro-viewer.vercel.app/api/render';
+};
+
+const RENDER_API_URL = getRenderApiUrl();
 
 export default function Preview({ blocks }) {
     const [renderedBlocks, setRenderedBlocks] = useState([]);
@@ -81,6 +92,24 @@ export default function Preview({ blocks }) {
                     </div>
                 ) : (
                     <>
+                        <style>{`
+                            /* Override component backgrounds for dark theme preview */
+                            .preview-content .hero,
+                            .preview-content .hero-section,
+                            .preview-content .features,
+                            .preview-content section[class*="hero"],
+                            .preview-content section[class*="Hero"] {
+                                background: transparent !important;
+                            }
+                            .preview-content .feature-card {
+                                background: rgba(255, 255, 255, 0.05) !important;
+                                border-color: rgba(255, 255, 255, 0.1) !important;
+                                color: #ffffff !important;
+                            }
+                            .preview-content .feature-card h3 {
+                                color: #ffffff !important;
+                            }
+                        `}</style>
                         {renderedBlocks.map((block) => (
                             <div key={block.index}>
                                 <style>{block.css}</style>

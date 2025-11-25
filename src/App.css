@@ -309,6 +309,50 @@
   border-radius: var(--radius-md);
   padding: var(--space-lg);
   overflow-y: auto;
+  color: var(--color-text-primary);
+}
+
+/* Override component backgrounds to match dark theme in preview */
+.preview-content section,
+.preview-content .hero,
+.preview-content .hero-section,
+.preview-content .features,
+.preview-content .feature-card,
+.preview-content > div > div {
+  background: transparent !important;
+}
+
+/* Override white/light backgrounds on cards and containers */
+.preview-content .feature-card,
+.preview-content [class*="card"],
+.preview-content [class*="Card"] {
+  background: var(--color-surface) !important;
+  border-color: var(--color-border) !important;
+}
+
+/* Ensure text is visible on dark background */
+.preview-content h1,
+.preview-content h2,
+.preview-content h3,
+.preview-content h4,
+.preview-content h5,
+.preview-content h6 {
+  color: var(--color-text-primary);
+}
+
+.preview-content p {
+  color: var(--color-text-secondary);
+}
+
+/* Override any white backgrounds */
+.preview-content [style*="background: white"],
+.preview-content [style*="background-color: white"],
+.preview-content [style*="background: #fff"],
+.preview-content [style*="background-color: #fff"],
+.preview-content [style*="background: #f0f0f0"],
+.preview-content [style*="background-color: #f0f0f0"] {
+  background: var(--color-surface) !important;
+  background-color: var(--color-surface) !important;
 }
 
 /* Loading State */
