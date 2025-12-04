@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import './App.css';
 import BlockList from './components/BlockList';
 import BlockEditor from './components/BlockEditor';
 import Preview from './components/Preview';
-import { fetchPages, savePage, fetchComponentRegistry } from './utils/api';
+import { fetchPages, savePage, saveDraftPage, publishPage, fetchComponentRegistry, fetchLayouts } from './utils/api';
 
 function App() {
   const [pages, setPages] = useState([]);
@@ -14,11 +14,14 @@ function App() {
   const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState(null);
   const [componentRegistry, setComponentRegistry] = useState([]);
+  const [layouts, setLayouts] = useState([]);
+  const [autosaving, setAutosaving] = useState(false);
 
-  // Load pages and component registry on mount
+  // Load pages, component registry, and layouts on mount
   useEffect(() => {
     loadPages();
     loadComponentRegistry();
+    loadLayoutRegistry();
   }, []);
 
   const loadPages = async () => {
@@ -48,12 +51,29 @@ function App() {
     }
   };
 
+  const loadLayoutRegistry = async () => {
+    try {
+      const layoutsData = await fetchLayouts();
+      setLayouts(layoutsData);
+    } catch (err) {
+      console.error('Failed to load layouts:', err);
+    }
+  };
+
   const handlePageChange = (slug) => {
     const page = pages.find((p) => p.slug === slug);
     if (page) {
       setCurrentPage(page);
       setSelectedBlockIndex(null);
     }
+  };
+
+  const handleLayoutChange = (layoutId) => {
+    if (!currentPage) return;
+    setCurrentPage({
+      ...currentPage,
+      layout: layoutId,
+    });
   };
 
   const handleAddBlock = (newBlock) => {
@@ -116,6 +136,30 @@ function App() {
     }
   };
 
+  // --- Draft autosave behavior ---
+  // We autosave the current page as a draft whenever its structure changes.
+  const autosaveDraft = useCallback(
+    async (page) => {
+      if (!page) return;
+      try {
+        setAutosaving(true);
+        await saveDraftPage(page);
+      } catch (err) {
+        console.error('Autosave draft failed:', err);
+      } finally {
+        setAutosaving(false);
+      }
+    },
+    []
+  );
+
+  // Trigger autosave when the currentPage changes (blocks or layout)
+  useEffect(() => {
+    if (!currentPage) return;
+    // Fire and forget; errors are logged inside autosaveDraft
+    autosaveDraft(currentPage);
+  }, [currentPage, autosaveDraft]);
+
   const handleSave = async () => {
     if (!currentPage) return;
 
@@ -124,18 +168,21 @@ function App() {
       setError(null);
       setSuccessMessage(null);
 
-      await savePage(currentPage);
+      // First ensure the latest state is in the draft store
+      await saveDraftPage(currentPage);
+      // Then publish the draft to live
+      await publishPage(currentPage.slug);
 
-      // Update pages list
+      // Update pages list (live version now matches current draft)
       const updatedPages = pages.map((p) =>
         p.slug === currentPage.slug ? currentPage : p
       );
       setPages(updatedPages);
 
-      setSuccessMessage('Page saved successfully!');
+      setSuccessMessage('Page published successfully!');
       setTimeout(() => setSuccessMessage(null), 3000);
     } catch (err) {
-      setError('Failed to save page. Please try again.');
+      setError('Failed to publish page. Please try again.');
       console.error(err);
     } finally {
       setSaving(false);
@@ -152,6 +199,7 @@ function App() {
       slug,
       title,
       blocks: [],
+      layout: 'default',
     };
 
     setPages([...pages, newPage]);
@@ -192,6 +240,26 @@ function App() {
           </button>
         </div>
 
+        {currentPage && layouts.length > 0 && (
+          <div className="header-controls">
+            <label htmlFor="layout-selector" style={{ marginRight: '8px' }}>
+              Layout:
+            </label>
+            <select
+              id="layout-selector"
+              className="layout-selector"
+              value={currentPage.layout || 'default'}
+              onChange={(e) => handleLayoutChange(e.target.value)}
+            >
+              {layouts.map((layout) => (
+                <option key={layout.id} value={layout.id}>
+                  {layout.label}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+
         <div className="header-actions">
           <button onClick={loadPages} disabled={loading}>
             🔄 Refresh
@@ -201,13 +269,18 @@ function App() {
             onClick={handleSave}
             disabled={saving || !currentPage}
           >
-            {saving ? 'Saving...' : '💾 Save'}
+            {saving ? 'Publishing...' : '💾 Publish'}
           </button>
         </div>
       </header>
 
       {error && <div className="error">{error}</div>}
       {successMessage && <div className="success">{successMessage}</div>}
+      {autosaving && !saving && (
+        <div className="info" style={{ textAlign: 'right', padding: '0 1rem' }}>
+          Autosaving draft...
+        </div>
+      )}
 
       {!currentPage ? (
         <div className="empty-state" style={{ flex: 1 }}>
@@ -233,6 +306,7 @@ function App() {
           <Preview
             blocks={currentPage.blocks}
             pageSlug={currentPage.slug}
+            layout={currentPage.layout}
           />
 
           <BlockEditor
