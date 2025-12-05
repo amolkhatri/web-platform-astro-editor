@@ -3,6 +3,7 @@ import './App.css';
 import BlockList from './components/BlockList';
 import BlockEditor from './components/BlockEditor';
 import Preview from './components/Preview';
+import ComponentPlayground from './components/ComponentPlayground';
 import { fetchPages, savePage, saveDraftPage, publishPage, fetchComponentRegistry, fetchLayouts } from './utils/api';
 
 function App() {
@@ -16,6 +17,7 @@ function App() {
   const [componentRegistry, setComponentRegistry] = useState([]);
   const [layouts, setLayouts] = useState([]);
   const [autosaving, setAutosaving] = useState(false);
+  const [showPlayground, setShowPlayground] = useState(false);
 
   // Load pages, component registry, and layouts on mount
   useEffect(() => {
@@ -207,6 +209,11 @@ function App() {
     setSelectedBlockIndex(null);
   };
 
+  const handleComponentCreated = () => {
+    // Refresh component registry after creating a new component
+    loadComponentRegistry();
+  };
+
   if (loading) {
     return (
       <div className="app">
@@ -237,6 +244,10 @@ function App() {
 
           <button onClick={handleNewPage}>
             + New Page
+          </button>
+
+          <button onClick={() => setShowPlayground(true)}>
+            🎨 Component Playground
           </button>
         </div>
 
@@ -315,6 +326,13 @@ function App() {
             componentRegistry={componentRegistry}
           />
         </main>
+      )}
+
+      {showPlayground && (
+        <ComponentPlayground
+          onClose={() => setShowPlayground(false)}
+          onComponentCreated={handleComponentCreated}
+        />
       )}
     </div>
   );

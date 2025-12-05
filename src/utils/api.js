@@ -17,12 +17,12 @@ const VIEWER_API_URL = getApiBaseUrl();
  */
 export async function fetchComponentRegistry() {
     try {
-        const response = await fetch(`${VIEWER_API_URL}/components`);
+        const response = await fetch(`${VIEWER_API_URL}/components.json`);
         if (!response.ok) {
             throw new Error('Failed to fetch component registry');
         }
         const data = await response.json();
-        return data.components;
+        return data; // API returns array directly, not { components: [...] }
     } catch (error) {
         console.error('Error fetching component registry:', error);
         throw error;
@@ -151,3 +151,45 @@ export async function publishPage(slug) {
         throw error;
     }
 }
+
+/**
+ * Fetch all custom components from the viewer
+ */
+export async function fetchCustomComponents() {
+    try {
+        const response = await fetch(`${VIEWER_API_URL}/custom-components`);
+        if (!response.ok) {
+            throw new Error('Failed to fetch custom components');
+        }
+        return await response.json();
+    } catch (error) {
+        console.error('Error fetching custom components:', error);
+        throw error;
+    }
+}
+
+/**
+ * Save a custom component to the viewer
+ */
+export async function saveCustomComponent(componentData) {
+    try {
+        const response = await fetch(`${VIEWER_API_URL}/custom-components`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(componentData),
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to save custom component');
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error('Error saving custom component:', error);
+        throw error;
+    }
+}
+
+
